@@ -59,17 +59,16 @@ var config ProctorConfig
 type ProctorConfig struct {
 	viper    *viper.Viper
 	LogLevel string
+	AppPort  string
+	EtcdPort string
 }
 
 func load() ProctorConfig {
-	//TODO: fang.SetEnv not working properly, check and implement that
 	fang := viper.New()
-	//TODO: see why key replacer not giving desired output
-	//fang.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	fang.AutomaticEnv()
+
+	fang.SetConfigType("yaml")
 	fang.SetConfigName("config")
-	fang.SetConfigFile(".env")
-	fang.AddConfigPath(".")
+	fang.AddConfigPath(".")  
 	value, available := os.LookupEnv("CONFIG_LOCATION")
 	if available {
 		fang.AddConfigPath(value)
@@ -81,9 +80,10 @@ func load() ProctorConfig {
 	}
 	proctorConfig := ProctorConfig{
 		viper:    fang,
-		LogLevel: GetStringDefault(fang, "log.level", "debug"),
+		LogLevel: fang.GetString("log_level"),
+		EtcdPort: fang.GetString("etcd_port"),
+		AppPort: fang.GetString("app_port"),
 	}
-
 	return proctorConfig
 }
 
@@ -123,6 +123,5 @@ func Config() ProctorConfig {
 		config = load()
 		reset.Set(false)
 	}
-
 	return config
 }

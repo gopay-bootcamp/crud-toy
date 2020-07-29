@@ -1,9 +1,8 @@
 package logger
 
 import (
-	"loggingInfra/internal/app/service/infra/config"
 	"os"
-
+	"crud-toy/internal/app/service/infra/config"
 	"github.com/rs/zerolog"
 )
 
@@ -51,13 +50,13 @@ func Fatal(msg string) {
 	log.logger.Fatal().Msgf(msg)
 }
 
-func Error(err error, action string) {
+func Error(action string, err error) {
 	log.logger.Print("Error caused ", log.logger.Err(err), " due to ", action)
 }
 
 func LogErrors(err error, action string) {
 	if err != nil {
-		Error(err, action)
+		Error(action,err)
 	} else {
 		Debug(action)
 	}

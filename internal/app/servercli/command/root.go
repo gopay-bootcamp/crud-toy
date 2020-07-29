@@ -1,6 +1,7 @@
 package command
 
 import (
+	"crud-toy/internal/app/service/infra/logger"
 	"crud-toy/internal/app/servercli/command/start"
 	"fmt"
 	"os"
@@ -25,7 +26,7 @@ func Execute() {
 }
 
 func init() {
-
+	logger.Setup()
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.AddCommand(start.GetCmd())
 }

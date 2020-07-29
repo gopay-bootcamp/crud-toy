@@ -1,8 +1,8 @@
 package start
 
 import (
-	"fmt"
-
+	// "fmt"
+	"crud-toy/internal/app/service/server"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var startCmd = &cobra.Command{
 	Short:   "Start the CRUD server",
 	Long:    `Start the CRUD server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("CRUD server started")
+		server.Start()
 	},
 }
 

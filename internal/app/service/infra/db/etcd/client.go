@@ -1,6 +1,7 @@
 package etcd
 
 import (
+	"crud-toy/internal/app/service/infra/config"
 	"context"
 	"fmt"
 	"time"
@@ -24,6 +25,7 @@ type etcdClient struct {
 var (
 	dialTimeout    = 2 * time.Second
 	requestTimeout = 10 * time.Second
+	etcdHost = "localhost:"+ config.Config().EtcdPort
 )
 
 // function to create new client of etcd database
@@ -31,7 +33,7 @@ func NewClient() EtcdClient {
 
 	db, _ := clientv3.New(clientv3.Config{
 		DialTimeout: dialTimeout,
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   []string{etcdHost},
 	})
 	return &etcdClient{
 		db: db,
