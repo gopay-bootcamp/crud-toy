@@ -1,10 +1,12 @@
 package command
 
 import (
+	"crud-toy/internal/app/cli/command/create"
+	"crud-toy/internal/app/cli/command/delete"
+	"crud-toy/internal/app/cli/command/find"
+	"crud-toy/internal/app/cli/command/update"
 	"fmt"
 	"os"
-
-	"crud-toy/internal/app/cli/command/list"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -14,9 +16,9 @@ import (
 var cfgFile string
 
 var rootCmd = &cobra.Command{
-	Use:   "proctor-command",
-	Short: "proctor is a automation orchestrator",
-	Long:  `You can give commands to orchestrate your automation here.`,
+	Use:   "Store",
+	Short: "Welcome to the toy store",
+	Long:  `You can update your store details here.`,
 }
 
 func Execute() {
@@ -29,7 +31,10 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.AddCommand(list.GetCmd())
+	rootCmd.AddCommand(find.GetCmd())
+	rootCmd.AddCommand(create.GetCmd())
+	rootCmd.AddCommand(update.GetCmd())
+	rootCmd.AddCommand(delete.GetCmd())
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.proctor-command.yaml)")
 
