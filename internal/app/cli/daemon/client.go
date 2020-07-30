@@ -17,6 +17,13 @@ type Proc struct {
 	Author string `json:"author"`
 }
 
+type Client interface {
+	FindProcs(string) error
+	CreateProcs(string) error
+	DeleteProcs(string) error
+	UpdateProcs(string) error
+}
+
 type client struct {
 	printer               io.Printer
 	connectionTimeoutSecs time.Duration
@@ -31,7 +38,7 @@ func StartClient(printer io.Printer) {
 	}
 }
 
-func FindProcs(idString string) error {
+func (c *client) FindProcs(idString string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
@@ -64,7 +71,7 @@ func FindProcs(idString string) error {
 	return nil
 }
 
-func CreateProcs(name string, author string) error {
+func (c *client) CreateProcs(name string, author string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
@@ -90,7 +97,7 @@ func CreateProcs(name string, author string) error {
 	return nil
 }
 
-func UpdateProcs(idString string, name string, author string) error {
+func (c *client) UpdateProcs(idString string, name string, author string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
@@ -125,7 +132,7 @@ func UpdateProcs(idString string, name string, author string) error {
 	return nil
 }
 
-func DeleteProcs(idString string) error {
+func (c *client) DeleteProcs(idString string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
@@ -156,4 +163,20 @@ func DeleteProcs(idString string) error {
 		fmt.Print(bodyString)
 	}
 	return nil
+}
+
+func FindProcs(idString string) error {
+	return proctorDClient.FindProcs(idString)
+}
+
+func CreateProcs(name string, author string) error {
+	return proctorDClient.CreateProcs(name, author)
+}
+
+func UpdateProcs(idString string, name string, author string) error {
+	return proctorDClient.UpdateProcs(idString, name, author)
+}
+
+func DeleteProcs(idString string) error {
+	return proctorDClient.DeleteProcs(idString)
 }
