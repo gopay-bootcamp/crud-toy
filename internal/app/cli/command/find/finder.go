@@ -11,7 +11,7 @@ var findCmd = &cobra.Command{
 	Short: "Find procs by id",
 	Long:  `Search procs by unique id`,
 	Run: func(cmd *cobra.Command, args []string) {
-		daemon.FindProcs(args[0])
+		daemon.FindProcs(args)
 	},
 }
 

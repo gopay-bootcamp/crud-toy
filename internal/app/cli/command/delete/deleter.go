@@ -12,7 +12,7 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete procs by id",
 	Long:  `Delete procs by unique id`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := daemon.DeleteProcs(args[0])
+		err := daemon.DeleteProcs(args)
 		if err != nil {
 			fmt.Print(err)
 		}

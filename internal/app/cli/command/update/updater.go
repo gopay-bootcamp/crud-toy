@@ -11,7 +11,7 @@ var findCmd = &cobra.Command{
 	Short: "Update procs by id",
 	Long:  `Update procs by unique id`,
 	Run: func(cmd *cobra.Command, args []string) {
-		daemon.UpdateProcs(args[0], args[1], args[2])
+		daemon.UpdateProcs(args)
 	},
 }
 

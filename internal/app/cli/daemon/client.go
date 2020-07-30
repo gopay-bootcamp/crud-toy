@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"crud-toy/internal/app/cli/utility/io"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"time"
 )
 
 type Proc struct {
-	ID     int32  `json:"id"`
+	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Author string `json:"author"`
 }
@@ -38,15 +38,10 @@ func StartClient(printer io.Printer) {
 	}
 }
 
-func (c *client) FindProcs(idString string) error {
+func (c *client) FindProcs(id string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
-	id64, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		return err
-	}
-	id := int32(id64)
 	requestBody, err := json.Marshal(&Proc{
 		ID: id,
 	})
@@ -97,15 +92,10 @@ func (c *client) CreateProcs(name string, author string) error {
 	return nil
 }
 
-func (c *client) UpdateProcs(idString string, name string, author string) error {
+func (c *client) UpdateProcs(id string, name string, author string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
-	id64, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		return err
-	}
-	id := int32(id64)
 	requestBody, err := json.Marshal(&Proc{
 		ID:     id,
 		Name:   name,
@@ -132,15 +122,10 @@ func (c *client) UpdateProcs(idString string, name string, author string) error 
 	return nil
 }
 
-func (c *client) DeleteProcs(idString string) error {
+func (c *client) DeleteProcs(id string) error {
 	client := &http.Client{
 		Timeout: proctorDClient.connectionTimeoutSecs,
 	}
-	id64, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		return err
-	}
-	id := int32(id64)
 	requestBody, err := json.Marshal(&Proc{
 		ID: id,
 	})
@@ -165,18 +150,62 @@ func (c *client) DeleteProcs(idString string) error {
 	return nil
 }
 
-func FindProcs(idString string) error {
-	return proctorDClient.FindProcs(idString)
+func (c *client) ReadAllProcs() error {
+	client := &http.Client{
+		Timeout: proctorDClient.connectionTimeoutSecs,
+	}
+	req, err := http.NewRequest("GET", "http://localhost:3000/readAll", nil)
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusOK {
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		bodyString := string(bodyBytes)
+		fmt.Print(bodyString)
+	}
+	return nil
 }
 
-func CreateProcs(name string, author string) error {
+func FindProcs(args []string) error {
+	if len(args) < 1 {
+		return errors.New("Invalid argument error")
+	}
+	id := args[0]
+	return proctorDClient.FindProcs(id)
+}
+
+func CreateProcs(args []string) error {
+	if len(args) < 2 {
+		return errors.New("Invalid argument error")
+	}
+	name := args[0]
+	author := args[1]
 	return proctorDClient.CreateProcs(name, author)
 }
 
-func UpdateProcs(idString string, name string, author string) error {
-	return proctorDClient.UpdateProcs(idString, name, author)
+func UpdateProcs(args []string) error {
+	if len(args) < 3 {
+		return errors.New("Invalid argument error")
+	}
+	id := args[0]
+	name := args[1]
+	author := args[2]
+	return proctorDClient.UpdateProcs(id, name, author)
 }
 
-func DeleteProcs(idString string) error {
-	return proctorDClient.DeleteProcs(idString)
+func DeleteProcs(args []string) error {
+	if len(args) < 1 {
+		return errors.New("Invalid argument error")
+	}
+	id := args[0]
+	return proctorDClient.DeleteProcs(id)
+}
+
+func ReadAllProcs() error {
+	return proctorDClient.ReadAllProcs()
 }

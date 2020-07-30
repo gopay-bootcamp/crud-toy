@@ -1,4 +1,4 @@
-package create
+package readall
 
 import (
 	"crud-toy/internal/app/cli/daemon"
@@ -6,18 +6,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create procs",
-	Long:  `Create procs by giving name, author`,
+var readAllCmd = &cobra.Command{
+	Use:   "readall",
+	Short: "Show all Procs",
+	Long:  `See all procs in the database`,
 	Run: func(cmd *cobra.Command, args []string) {
-		daemon.CreateProcs(args)
+		daemon.ReadAllProcs()
 	},
 }
 
 // execute the listCmd
 func GetCmd() *cobra.Command {
-	return createCmd
+	return readAllCmd
 }
 
 func init() {

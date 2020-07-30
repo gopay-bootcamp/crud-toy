@@ -4,6 +4,7 @@ import (
 	"crud-toy/internal/app/cli/command/create"
 	"crud-toy/internal/app/cli/command/delete"
 	"crud-toy/internal/app/cli/command/find"
+	"crud-toy/internal/app/cli/command/readall"
 	"crud-toy/internal/app/cli/command/update"
 	"fmt"
 	"os"
@@ -35,6 +36,7 @@ func init() {
 	rootCmd.AddCommand(create.GetCmd())
 	rootCmd.AddCommand(update.GetCmd())
 	rootCmd.AddCommand(delete.GetCmd())
+	rootCmd.AddCommand(readall.GetCmd())
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.proctor-command.yaml)")
 
