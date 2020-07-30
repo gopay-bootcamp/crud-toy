@@ -1,6 +1,7 @@
 package execution
 
 import (
+	"strconv"
 	"fmt"
 	"time"
 	"encoding/json"
@@ -34,7 +35,7 @@ type execution struct {
 }
 
 type Proc struct {
-	ID int32 `json:"id"`
+	ID string `json:"id"`
 	Name string `json:"name"`
 	Author string `json:"author"`
 }
@@ -51,19 +52,18 @@ func (e *execution) CreateProc(w http.ResponseWriter,r *http.Request){
 	ctx,cancel := context.WithTimeout(context.Background(),timeout)
 	var proc Proc
 	var b [8]byte
-	id,_ := crypto_rand.Read(b[:])
+	crypto_rand.Read(b[:])
 	math_rand.Seed(int64(binary.LittleEndian.Uint64(b[:])))
 	json.NewDecoder(r.Body).Decode(&proc)
-	proc.ID=math_rand.Int31()
+	proc.ID=strconv.FormatInt(math_rand.Int63(),10)
 	value,err := json.Marshal(proc)
 	if err !=nil{
 		w.Write([]byte(err.Error()))
 	}
 	fmt.Println(string(value))
-	e.client.PutValue(ctx,fmt.Sprintf("key_%d",id),string(value))
+	e.client.PutValue(ctx,fmt.Sprintf("key_%s",proc.ID),string(value))
 	json.NewEncoder(w).Encode(&proc)
 	cancel()
-
 }
 
 func (e *execution) ReadProcByID(w http.ResponseWriter,r *http.Request){
@@ -73,11 +73,16 @@ func (e *execution) ReadProcByID(w http.ResponseWriter,r *http.Request){
 	var proc Proc
 	json.NewDecoder(r.Body).Decode(&proc)
 	id := proc.ID
-	gr,err :=e.client.GetValue(ctx,fmt.Sprintf("key_%d",id))
+	gr,err :=e.client.GetValue(ctx,fmt.Sprintf("key_%s",id))
 	if err !=nil{
 		w.Write([]byte(err.Error()))
 	}
+
+	if len(gr.Kvs)==0 {
+	json.NewEncoder(w).Encode(string("no value present"))
+	} else {
 	json.NewEncoder(w).Encode(string(gr.Kvs[0].Value))
+	}
 	cancel()
 
 }
@@ -114,7 +119,7 @@ func (e *execution) UpdateProc(w http.ResponseWriter,r *http.Request){
 	if err !=nil{
 		w.Write([]byte(err.Error()))
 	}
-	e.client.PutValue(ctx,fmt.Sprintf("key_%d",proc.ID),string(value))
+	e.client.PutValue(ctx,fmt.Sprintf("key_%s",proc.ID),string(value))
 	json.NewEncoder(w).Encode(&proc)
 	cancel()
 
@@ -127,7 +132,7 @@ func (e *execution) DeleteProc(w http.ResponseWriter,r *http.Request){
 	var proc Proc
 	json.NewDecoder(r.Body).Decode(&proc)
 	id := proc.ID
-	err:=e.client.DeleteKey(ctx,fmt.Sprintf("key_%d",id))
+	err:=e.client.DeleteKey(ctx,fmt.Sprintf("key_%s",id))
 	if err != nil {
 		w.Write([]byte(err.Error()))
 	}
