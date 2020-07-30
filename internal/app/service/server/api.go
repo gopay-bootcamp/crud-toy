@@ -1,21 +1,23 @@
 package server
 
 import (
-	"crud-toy/internal/app/service/infra/config"
-	"github.com/urfave/negroni"
-	"crud-toy/internal/app/service/infra/logger"
-	"os/signal"
-	"os"
-	"syscall"
-	"net/http"
 	"context"
+	"crud-toy/internal/app/service/infra/config"
+	"crud-toy/internal/app/service/infra/db/etcd"
 	"crud-toy/internal/app/service/infra/execution"
+	"crud-toy/internal/app/service/infra/logger"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/urfave/negroni"
 )
 
 func Start() error {
-	
-	appPort := ":" +config.Config().AppPort
+
+	appPort := ":" + config.Config().AppPort
 	server := negroni.New(negroni.NewRecovery())
 	exec := execution.GetDbClient()
 	router, err := NewRouter(exec)
@@ -29,6 +31,18 @@ func Start() error {
 		Addr:    appPort,
 		Handler: server,
 	}
+
+	go func() {
+		ctx := context.Background()
+		client := etcd.NewClient()
+		defer client.Close()
+		watchChan := client.SetWatchOnPrefix(ctx, "key")
+		for watchResp := range watchChan {
+			for _, event := range watchResp.Events {
+				fmt.Printf("Event received! %s executed on %q with value %q\n", event.Type, event.Kv.Key, event.Kv.Value)
+			}
+		}
+	}()
 
 	go func() {
 		sigint := make(chan os.Signal, 1)
