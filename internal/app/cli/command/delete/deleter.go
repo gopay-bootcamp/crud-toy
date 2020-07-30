@@ -2,6 +2,7 @@ package delete
 
 import (
 	"crud-toy/internal/app/cli/daemon"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +12,10 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete procs by id",
 	Long:  `Delete procs by unique id`,
 	Run: func(cmd *cobra.Command, args []string) {
-		daemon.DeleteProcs(args[0])
+		err := daemon.DeleteProcs(args[0])
+		if err != nil {
+			fmt.Print(err)
+		}
 	},
 }
 
