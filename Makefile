@@ -19,7 +19,7 @@ CONFIG_LOCATION := $(SRC_DIR)
 $(@info $(shell mkdir -p $(OUT_DIR) $(BIN_DIR) $(PLUGIN_DIR))
 
 .PHONY: build
-build: server cli
+build: server cli watcher
 
 .PHONY: server
 server:
@@ -35,3 +35,7 @@ start-server:
 .PHONY: cli
 cli:
 	go build -race -o $(BIN_DIR)/cli ./cmd/cli/main.go
+
+.PHONY: watcher
+watcher:
+	go build -race -o $(BIN_DIR)/watcher ./cmd/watcher/main.go

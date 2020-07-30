@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"crud-toy/internal/app/service/infra/db/etcd"
-	"math/rand"
+	crypto_rand "crypto/rand"
+	math_rand "math/rand"
 	"context"
+	"encoding/binary"
 )
 
 var (
@@ -48,9 +50,11 @@ func (e *execution) CreateProc(w http.ResponseWriter,r *http.Request){
 	w.Header().Set("Content-Type","application/json")
 	ctx,cancel := context.WithTimeout(context.Background(),timeout)
 	var proc Proc
-	id := rand.Int31()
+	var b [8]byte
+	id,_ := crypto_rand.Read(b[:])
+	math_rand.Seed(int64(binary.LittleEndian.Uint64(b[:])))
 	json.NewDecoder(r.Body).Decode(&proc)
-	proc.ID=id
+	proc.ID=math_rand.Int31()
 	value,err := json.Marshal(proc)
 	if err !=nil{
 		w.Write([]byte(err.Error()))
