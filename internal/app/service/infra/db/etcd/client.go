@@ -13,9 +13,10 @@ type EtcdClient interface {
 	DeleteKey(ctx context.Context, key string) error
 	PutValue(ctx context.Context, key string, value string) (*clientv3.PutResponse, error)
 	GetValue(ctx context.Context, key string) (*clientv3.GetResponse, error)
+	GetAllValueWithPrefix(ctx context.Context, key string) (*clientv3.GetResponse, error)
 	GetValueWithRevision(ctx context.Context, key string, pr *clientv3.PutResponse) (*clientv3.GetResponse, error)
 	Close()
-	SetWatchOnKey(ctx context.Context, key string) clientv3.WatchChan
+	SetWatchOnPrefix(ctx context.Context, prefix string) clientv3.WatchChan
 }
 
 type etcdClient struct {
@@ -65,6 +66,13 @@ func (client *etcdClient) GetValue(ctx context.Context, key string) (*clientv3.G
 	return res.OpResponse().Get(), nil
 }
 
+func (client *etcdClient) GetAllValueWithPrefix(ctx context.Context, key string) (*clientv3.GetResponse, error) {
+	res, err := client.db.Get(ctx, key, clientv3.WithPrefix(),clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+	if err != nil {
+		return nil, err
+	}
+	return res.OpResponse().Get(), nil
+}
 func (client *etcdClient) GetValueWithRevision(ctx context.Context, key string, pr *clientv3.PutResponse) (*clientv3.GetResponse, error) {
 	res, err := client.db.Get(ctx, key, clientv3.WithRev(pr.Header.Revision))
 	if err != nil {
@@ -73,9 +81,9 @@ func (client *etcdClient) GetValueWithRevision(ctx context.Context, key string, 
 	return res.OpResponse().Get(), nil
 }
 
-func (client *etcdClient) SetWatchOnKey(ctx context.Context, key string) clientv3.WatchChan {
-	watchChan := client.db.Watch(ctx, key)
-	fmt.Println("set WATCH on " + key)
+func (client *etcdClient) SetWatchOnPrefix(ctx context.Context, prefix string) clientv3.WatchChan {
+	watchChan := client.db.Watch(ctx, prefix, clientv3.WithPrefix())
+	fmt.Println("set WATCH on " + prefix)
 	return watchChan
 
 }

@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"net/http"
 	"context"
+	"crud-toy/internal/app/service/infra/execution"
 
 )
 
@@ -16,12 +17,14 @@ func Start() error {
 	
 	appPort := ":" +config.Config().AppPort
 	server := negroni.New(negroni.NewRecovery())
-	router, err := NewRouter()
+	exec := execution.GetDbClient()
+	router, err := NewRouter(exec)
+	defer exec.CloseDbClient()
 	if err != nil {
 		return err
 	}
 	server.UseHandler(router)
-	logger.Info(`Starting server on port 3000`)
+	logger.Info("Starting server on port " + string(appPort))
 	httpServer := &http.Server{
 		Addr:    appPort,
 		Handler: server,
