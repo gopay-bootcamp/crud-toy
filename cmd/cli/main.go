@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	printer := io.GetPrinter()
-	daemon.StartClient(printer)
+	io.InitPrinter()
+	daemon.StartClient()
 
 	command.Execute()
 }

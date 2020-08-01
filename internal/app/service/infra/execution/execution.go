@@ -81,7 +81,7 @@ func (e *execution) ReadProcByID(w http.ResponseWriter,r *http.Request){
 	if len(gr.Kvs)==0 {
 	json.NewEncoder(w).Encode(string("no value present"))
 	} else {
-	json.NewEncoder(w).Encode(string(gr.Kvs[0].Value))
+	w.Write(gr.Kvs[0].Value)
 	}
 	cancel()
 
@@ -102,9 +102,9 @@ func (e *execution) ReadAllProc(w http.ResponseWriter,r *http.Request){
 		json.Unmarshal([]byte(str),&proc)
 		procs = append(procs,proc)
 	}
-	value,err := json.Marshal(procs)
+	//value,err := json.Marshal(procs)
 
-	json.NewEncoder(w).Encode(string(value))
+	json.NewEncoder(w).Encode(procs)
 	cancel()
 
 }
