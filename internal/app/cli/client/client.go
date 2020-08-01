@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"crud-toy/internal/app/cli/utility/io"
-	"crud-toy/internal/app/service/infra/proc"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -31,11 +30,19 @@ func NewClient() Client {
 	}
 }
 
+
+
+type Proc struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Author string `json:"author"`
+}
+
 func (c *client) FindProcs(id string) error {
 	client := &http.Client{
 		Timeout: c.connectionTimeoutSecs,
 	}
-	requestBody, err := json.Marshal(&proc.Proc{
+	requestBody, err := json.Marshal(&Proc{
 		ID: id,
 	})
 	if err != nil {
@@ -63,7 +70,7 @@ func (c *client) CreateProcs(name string, author string) error {
 	client := &http.Client{
 		Timeout: c.connectionTimeoutSecs,
 	}
-	requestBody, err := json.Marshal(&proc.Proc{
+	requestBody, err := json.Marshal(&Proc{
 		Name:   name,
 		Author: author,
 	})
@@ -89,7 +96,7 @@ func (c *client) UpdateProcs(id string, name string, author string) error {
 	client := &http.Client{
 		Timeout: c.connectionTimeoutSecs,
 	}
-	requestBody, err := json.Marshal(&proc.Proc{
+	requestBody, err := json.Marshal(&Proc{
 		ID:     id,
 		Name:   name,
 		Author: author,
@@ -119,7 +126,7 @@ func (c *client) DeleteProcs(id string) error {
 	client := &http.Client{
 		Timeout: c.connectionTimeoutSecs,
 	}
-	requestBody, err := json.Marshal(&proc.Proc{
+	requestBody, err := json.Marshal(&Proc{
 		ID: id,
 	})
 	if err != nil {
@@ -158,9 +165,7 @@ func (c *client) ReadAllProcs() error {
 		if err != nil {
 			return err
 		}
-		var procsList []proc.Proc
-		json.Unmarshal(bodyBytes, &procsList)
-		c.printer.PrintTable(procsList)
+		c.printer.PrintTable(bodyBytes)
 	}
 	return nil
 }

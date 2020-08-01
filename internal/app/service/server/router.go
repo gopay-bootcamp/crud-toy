@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/gorilla/mux"
-	"crud-toy/internal/app/service/infra/execution"
+	"crud-toy/internal/app/service/execution"
 )
 
 

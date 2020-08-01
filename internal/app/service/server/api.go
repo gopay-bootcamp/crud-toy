@@ -4,14 +4,13 @@ import (
 	"context"
 	"crud-toy/internal/app/service/infra/config"
 	"crud-toy/internal/app/service/infra/db/etcd"
-	"crud-toy/internal/app/service/infra/execution"
+	"crud-toy/internal/app/service/execution"
 	"crud-toy/internal/app/service/infra/logger"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-
+	// "os"
+	// "os/signal"
+	// "syscall"
 	"github.com/urfave/negroni"
 )
 
@@ -44,18 +43,18 @@ func Start() error {
 		}
 	}()
 
-	go func() {
-		sigint := make(chan os.Signal, 1)
+	// go func() {
+	// 	sigint := make(chan os.Signal, 1)
 
-		signal.Notify(sigint, os.Interrupt)
-		signal.Notify(sigint, syscall.SIGTERM)
+	// 	signal.Notify(sigint, os.Interrupt)
+	// 	signal.Notify(sigint, syscall.SIGTERM)
 
-		<-sigint
+	// 	<-sigint
 
-		if shutdownErr := httpServer.Shutdown(context.Background()); shutdownErr != nil {
-			logger.Error("Received an Interrupt Signal", shutdownErr)
-		}
-	}()
+	// 	if shutdownErr := httpServer.Shutdown(context.Background()); shutdownErr != nil {
+	// 		logger.Error("Received an Interrupt Signal", shutdownErr)
+	// 	}
+	// }()
 
 	if err = httpServer.ListenAndServe(); err != nil {
 		logger.Error("HTTP Server Failed ", err)
