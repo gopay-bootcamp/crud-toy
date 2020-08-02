@@ -2,7 +2,7 @@ package client
 
 import (
 	"bytes"
-	"crud-toy/internal/app/cli/utility/io"
+	"crud-toy/internal/app/cli/printer"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
