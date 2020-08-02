@@ -10,6 +10,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/jedib0t/go-pretty/v6 v6.0.4
+	github.com/jmoiron/sqlx v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/prometheus/client_golang v0.9.3

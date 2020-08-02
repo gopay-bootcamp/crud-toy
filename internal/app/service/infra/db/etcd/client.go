@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"time"
-
 	"github.com/coreos/etcd/clientv3"
 )
 
