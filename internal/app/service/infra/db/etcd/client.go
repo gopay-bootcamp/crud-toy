@@ -1,19 +1,23 @@
 package etcd
 
 import (
-	"crud-toy/internal/app/service/infra/config"
 	"context"
+	"crud-toy/internal/app/model"
+	"crud-toy/internal/app/service/infra/config"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
+
 	"github.com/coreos/etcd/clientv3"
 )
 
 type EtcdClient interface {
 	DeleteKey(ctx context.Context, key string) error
-	PutValue(ctx context.Context, key string, value string) (*clientv3.PutResponse, error)
-	GetValue(ctx context.Context, key string) (*clientv3.GetResponse, error)
-	GetAllValueWithPrefix(ctx context.Context, key string) (*clientv3.GetResponse, error)
-	GetValueWithRevision(ctx context.Context, key string, pr *clientv3.PutResponse) (*clientv3.GetResponse, error)
+	GetValue(ctx context.Context, key string) (*model.Proc, error)
+	PutValue(ctx context.Context, key string, value *model.Proc) (*model.Proc, error)
+	GetAllValues(ctx context.Context) ([]model.Proc, error)
+	GetValueWithRevision(ctx context.Context, key string, pr *clientv3.PutResponse) (*model.Proc, error)
 	Close()
 	SetWatchOnPrefix(ctx context.Context, prefix string) clientv3.WatchChan
 }
@@ -25,7 +29,7 @@ type etcdClient struct {
 var (
 	dialTimeout    = 2 * time.Second
 	requestTimeout = 10 * time.Second
-	etcdHost = "localhost:"+ config.Config().EtcdPort
+	etcdHost       = "localhost:" + config.Config().EtcdPort
 )
 
 // function to create new client of etcd database
@@ -41,7 +45,8 @@ func NewClient() EtcdClient {
 }
 
 // function to delete the key provided
-func (client *etcdClient) DeleteKey(ctx context.Context, key string) error {
+func (client *etcdClient) DeleteKey(ctx context.Context, id string) error {
+	key := fmt.Sprintf("key_%s", id)
 	_, err := client.db.Delete(ctx, key)
 	if err != nil {
 		return err
@@ -49,35 +54,63 @@ func (client *etcdClient) DeleteKey(ctx context.Context, key string) error {
 	return nil
 }
 
-func (client *etcdClient) PutValue(ctx context.Context, key string, value string) (*clientv3.PutResponse, error) {
-	pr, err := client.db.Put(ctx, key, value)
+func (client *etcdClient) PutValue(ctx context.Context, key string, proc *model.Proc) (*model.Proc, error) {
+	value, err := json.Marshal(proc)
+	key = fmt.Sprintf("key_%s", proc.ID)
 	if err != nil {
-		return pr.OpResponse().Put(), err
+		return nil, err
 	}
-	return pr.OpResponse().Put(), nil
+	_, err = client.db.Put(ctx, key, string(value))
+	if err != nil {
+		return nil, err
+	}
+	return proc, nil
 }
 
-func (client *etcdClient) GetValue(ctx context.Context, key string) (*clientv3.GetResponse, error) {
+func (client *etcdClient) GetValue(ctx context.Context, id string) (*model.Proc, error) {
+	key := fmt.Sprintf("key_%s", id)
 	res, err := client.db.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
-	return res.OpResponse().Get(), nil
+	gr := res.OpResponse().Get()
+	if len(gr.Kvs) == 0 {
+		return nil, errors.New("No proc found")
+	}
+	var proc *model.Proc
+	json.Unmarshal(gr.Kvs[0].Value, &proc)
+	return proc, nil
 }
 
-func (client *etcdClient) GetAllValueWithPrefix(ctx context.Context, key string) (*clientv3.GetResponse, error) {
-	res, err := client.db.Get(ctx, key, clientv3.WithPrefix(),clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+func (client *etcdClient) GetAllValues(ctx context.Context) ([]model.Proc, error) {
+	key := "key_"
+	res, err := client.db.Get(ctx, key, clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
 	if err != nil {
 		return nil, err
 	}
-	return res.OpResponse().Get(), nil
+	gr := res.OpResponse().Get()
+	var procs []model.Proc
+	for _, kv := range gr.Kvs {
+		proc := model.Proc{}
+		str := string(kv.Value)
+		json.Unmarshal([]byte(str), &proc)
+		procs = append(procs, proc)
+	}
+	return procs, nil
 }
-func (client *etcdClient) GetValueWithRevision(ctx context.Context, key string, pr *clientv3.PutResponse) (*clientv3.GetResponse, error) {
+func (client *etcdClient) GetValueWithRevision(ctx context.Context, id string, pr *clientv3.PutResponse) (*model.Proc, error) {
+	key := fmt.Sprintf("key_%s", id)
 	res, err := client.db.Get(ctx, key, clientv3.WithRev(pr.Header.Revision))
 	if err != nil {
 		return nil, err
 	}
-	return res.OpResponse().Get(), nil
+	gr := res.OpResponse().Get()
+	if len(gr.Kvs) == 0 {
+		return nil, errors.New("No proc found")
+	}
+	var proc *model.Proc
+	json.Unmarshal(gr.Kvs[0].Value, &proc)
+	return proc, nil
 }
 
 func (client *etcdClient) SetWatchOnPrefix(ctx context.Context, prefix string) clientv3.WatchChan {

@@ -2,12 +2,15 @@ package server
 
 import (
 	"context"
+	"crud-toy/internal/app/service/execution"
+	"crud-toy/internal/app/service/handler"
+
 	"crud-toy/internal/app/service/infra/config"
 	"crud-toy/internal/app/service/infra/db/etcd"
-	"crud-toy/internal/app/service/execution"
 	"crud-toy/internal/app/service/infra/logger"
 	"fmt"
 	"net/http"
+
 	// "os"
 	// "os/signal"
 	// "syscall"
@@ -18,8 +21,11 @@ func Start() error {
 
 	appPort := ":" + config.Config().AppPort
 	server := negroni.New(negroni.NewRecovery())
-	exec := execution.GetDbClient()
-	router, err := NewRouter(exec)
+	etcdClient := etcd.NewClient()
+	exec := execution.NewExec(etcdClient)
+	procHanlder := handler.NewProcHandler(exec)
+
+	router, err := NewRouter(procHanlder)
 	defer exec.CloseDbClient()
 	if err != nil {
 		return err
