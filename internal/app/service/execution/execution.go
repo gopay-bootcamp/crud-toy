@@ -6,7 +6,6 @@ import (
 	"crud-toy/internal/app/service/infra/db/etcd"
 	crypto_rand "crypto/rand"
 	"encoding/binary"
-	"fmt"
 	math_rand "math/rand"
 	"strconv"
 	"time"
@@ -56,7 +55,7 @@ func (e *execution) ReadProcByID(proc *model.Proc) (*model.Proc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	id := proc.ID
-	result, err := e.client.GetValue(ctx, fmt.Sprintf("key_%s", id))
+	result, err := e.client.GetValue(ctx, id)
 	if err != nil {
 		return nil, err
 	}
