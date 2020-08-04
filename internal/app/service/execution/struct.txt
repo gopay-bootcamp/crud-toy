@@ -1,0 +1,20 @@
+internal/app/
+    cli/
+    servercli/
+    service/
+        infra/
+        server/
+
+
+logger/
+config/
+internal/
+    client/
+        cli/
+    server/
+        execution/
+        cli/
+        db/etcd/
+        handler
+        api.go
+        router.go

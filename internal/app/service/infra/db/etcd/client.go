@@ -54,7 +54,7 @@ func (client *etcdClient) DeleteKey(ctx context.Context, id string) error {
 	return nil
 }
 
-func (client *etcdClient) PutValue(ctx context.Context, key string, proc *model.Proc) (*model.Proc, error) {
+func (client *etcdClient) PutValue(ctx context.Context, key string, proc *model.Proc) error {
 	value, err := json.Marshal(proc)
 	key = fmt.Sprintf("key_%s", proc.ID)
 	if err != nil {

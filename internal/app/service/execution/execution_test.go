@@ -18,15 +18,11 @@ func TestCreateProc(t *testing.T) {
 		Name:   "New Name",
 		Author: "New Author",
 	}
-	mockClient.On("PutValue").Return(ctx, &proc, nil)
+	mockClient.On("PutValue", proc.ID, proc).Return(nil)
 
-	result, _ := testExec.CreateProc(&proc)
-
+	err := testExec.CreateProc(&proc)
+	assert.NoError(err)
 	mockClient.AssertExpectations(t)
-	//data assertions
-	assert.NotNil(t, result.ID)
-	assert.Equal(t, "New Name", result.Name)
-	assert.Equal(t, "New Author", result.Author)
 }
 
 func TestReadAllProcs(t *testing.T) {
