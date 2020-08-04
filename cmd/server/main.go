@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crud-toy/internal/app/servercli/command"
+	"crud-toy/internal/server/cli/command"
 )
 
 func main() {

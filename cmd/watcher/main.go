@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"crud-toy/internal/app/service/infra/db/etcd"
+	"crud-toy/internal/server/db/etcd"
 )
 
 func main(){

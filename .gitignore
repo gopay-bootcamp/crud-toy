@@ -16,3 +16,4 @@ _output/*
 # vendor/
 
 .vscode/
+_output/

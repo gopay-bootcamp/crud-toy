@@ -1,9 +1,9 @@
 package main
 
 import (
-	"crud-toy/internal/app/cli/command"
-	"crud-toy/internal/app/cli/daemon"
-	"crud-toy/internal/app/cli/printer"
+	"crud-toy/internal/cli/command"
+	"crud-toy/internal/cli/daemon"
+	"crud-toy/internal/cli/printer"
 )
 
 func main() {
