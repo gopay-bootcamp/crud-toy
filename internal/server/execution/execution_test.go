@@ -10,7 +10,6 @@ import (
 )
 
 func TestCreateProc(t *testing.T) {
-	ctx := context.Background()
 	mockClient := new(etcd.ClientMock)
 	testExec := NewExec(mockClient)
 	proc := model.Proc{
@@ -21,6 +20,11 @@ func TestCreateProc(t *testing.T) {
 	mockClient.On("PutValue", proc.ID, &proc).Return("1",nil)
 
 	id,err := testExec.CreateProc(&proc)
+
+	if err != nil{
+		assert.Error(t,err)
+	}
+	assert.Equal(t, "1", id)
 }
 
 func TestReadAllProcs(t *testing.T) {
@@ -33,13 +37,11 @@ func TestReadAllProcs(t *testing.T) {
 	}
 	mockClient.On("GetAllValues").Return([]model.Proc{proc}, nil)
 
-	result, _ := testExec.ReadAllProc()
-
-	mockClient.AssertExpectations(t)
-	//data assertions
-	assert.NotNil(t, result[0].ID)
-	assert.Equal(t, "New Name", result[0].Name)
-	assert.Equal(t, "New Author", result[0].Author)
+	result, err := testExec.ReadAllProc()
+	if err != nil{
+		assert.Error(t,err)
+	}
+	assert.NotEqual(t,len(result),0)
 }
 
 func TestReadProcByID(t *testing.T) {
@@ -50,14 +52,15 @@ func TestReadProcByID(t *testing.T) {
 		Name:   "New Name",
 		Author: "New Author",
 	}
-	mockClient.On("GetValue").Return(&proc, nil)
+	mockClient.On("GetValue",proc.ID).Return(&proc, nil)
 
-	result, _ := testExec.ReadProcByID(&model.Proc{ID: "1"})
-	mockClient.AssertExpectations(t)
-	//data assertions
-	assert.NotNil(t, result.ID)
-	assert.Equal(t, "New Name", result.Name)
-	assert.Equal(t, "New Author", result.Author)
+	result, err:= testExec.ReadProcByID(&model.Proc{ID: "1"})
+	if err != nil{
+		assert.Error(t,err)
+	}
+	assert.Equal(t,result.ID,"1")
+
+	
 }
 
 func TestUpdateProc(t *testing.T) {
@@ -69,19 +72,18 @@ func TestUpdateProc(t *testing.T) {
 		Name:   "Changed Name",
 		Author: "Changed Author",
 	}
-	mockClient.On("PutValue").Return(ctx, &proc, nil)
+	mockClient.On("PutValue",proc.ID, &proc).Return(ctx, proc.ID, nil)
 
-	result, _ := testExec.UpdateProc(&model.Proc{
+	result, err := testExec.UpdateProc(&model.Proc{
 		ID:     "1",
 		Name:   "Name",
 		Author: "Author",
 	})
+	if err != nil{
+		assert.Error(t,err)
+	}
+	assert.Equal(t,result,"{ID:\"1\",Name:\"Name\",Author:\"Author\",}")
 
-	mockClient.AssertExpectations(t)
-	//data assertions
-	assert.NotNil(t, result.ID)
-	assert.Equal(t, "Changed Name", result.Name)
-	assert.Equal(t, "Changed Author", result.Author)
 }
 
 func TestDeleteProc(t *testing.T) {
