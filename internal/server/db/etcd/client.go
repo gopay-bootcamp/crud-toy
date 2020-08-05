@@ -3,7 +3,7 @@ package etcd
 import (
 	"context"
 	"crud-toy/internal/model"
-	"crud-toy/config"
+	// "crud-toy/config"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,7 +30,7 @@ type etcdClient struct {
 var (
 	dialTimeout    = 2 * time.Second
 	requestTimeout = 10 * time.Second
-	etcdHost       = "localhost:" + config.Config().EtcdPort
+	etcdHost       = "localhost:2379"
 )
 
 // function to create new client of etcd database

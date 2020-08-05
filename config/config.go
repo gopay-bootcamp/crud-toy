@@ -68,7 +68,8 @@ func load() ProctorConfig {
 
 	fang.SetConfigType("yaml")
 	fang.SetConfigName("config")
-	fang.AddConfigPath(".")  
+	fang.AddConfigPath(".")
+	fang.AddConfigPath("./")  
 	value, available := os.LookupEnv("CONFIG_LOCATION")
 	if available {
 		fang.AddConfigPath(value)
