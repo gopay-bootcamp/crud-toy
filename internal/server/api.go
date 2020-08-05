@@ -18,6 +18,8 @@ func Start() error {
 	server := negroni.New(negroni.NewRecovery())
 
 	etcdClient := etcd.NewClient()
+	defer etcdClient.Close()
+
 	exec := execution.NewExec(etcdClient)
 	procHandler := handler.NewProcHandler(exec)
 
@@ -27,7 +29,6 @@ func Start() error {
 		return err
 	}
 
-	defer etcdClient.Close()
 	server.UseHandler(router)
 	logger.Info("Starting server on port " + string(appPort))
 	httpServer := &http.Server{

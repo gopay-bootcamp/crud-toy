@@ -8,7 +8,6 @@ import (
 
 func NewRouter(procHandler handler.Handler) (*mux.Router, error) {
 	router := mux.NewRouter()
-
 	router.HandleFunc("/create", procHandler.CreateProc).Methods("POST")
 	router.HandleFunc("/read", procHandler.ReadProcByID).Methods("POST")
 	router.HandleFunc("/readAll", procHandler.ReadAllProc).Methods("GET")

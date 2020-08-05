@@ -1,7 +1,6 @@
 package execution
 
 import (
-	"context"
 	"crud-toy/internal/model"
 	"crud-toy/internal/server/db/etcd"
 	"testing"
@@ -17,13 +16,14 @@ func TestCreateProc(t *testing.T) {
 		Name:   "New Name",
 		Author: "New Author",
 	}
-	mockClient.On("PutValue", proc.ID, &proc).Return("1",nil)
+	mockClient.On("PutValue", &proc).Return("1",nil)
 
 	id,err := testExec.CreateProc(&proc)
 
 	if err != nil{
 		assert.Error(t,err)
 	}
+	mockClient.AssertExpectations(t)
 	assert.Equal(t, "1", id)
 }
 
@@ -41,6 +41,7 @@ func TestReadAllProcs(t *testing.T) {
 	if err != nil{
 		assert.Error(t,err)
 	}
+	mockClient.AssertExpectations(t)
 	assert.NotEqual(t,len(result),0)
 }
 
@@ -58,13 +59,11 @@ func TestReadProcByID(t *testing.T) {
 	if err != nil{
 		assert.Error(t,err)
 	}
+	mockClient.AssertExpectations(t)
 	assert.Equal(t,result.ID,"1")
-
-	
 }
 
 func TestUpdateProc(t *testing.T) {
-	ctx := context.Background()
 	mockClient := new(etcd.ClientMock)
 	testExec := NewExec(mockClient)
 	proc := model.Proc{
@@ -72,18 +71,13 @@ func TestUpdateProc(t *testing.T) {
 		Name:   "Changed Name",
 		Author: "Changed Author",
 	}
-	mockClient.On("PutValue",proc.ID, &proc).Return(ctx, proc.ID, nil)
+	mockClient.On("PutValue", &proc).Return(proc.ID, nil)
 
-	result, err := testExec.UpdateProc(&model.Proc{
-		ID:     "1",
-		Name:   "Name",
-		Author: "Author",
-	})
+	_, err := testExec.UpdateProc(&proc)
 	if err != nil{
 		assert.Error(t,err)
 	}
-	assert.Equal(t,result,"{ID:\"1\",Name:\"Name\",Author:\"Author\",}")
-
+	mockClient.AssertExpectations(t)
 }
 
 func TestDeleteProc(t *testing.T) {
