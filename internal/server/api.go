@@ -2,23 +2,28 @@ package server
 
 import (
 	"context"
-	"crud-toy/internal/server/execution"
-	"crud-toy/internal/server/handler"
 	"crud-toy/config"
 	"crud-toy/internal/server/db/etcd"
+	"crud-toy/internal/server/execution"
+	"crud-toy/internal/server/handler"
+	"crud-toy/internal/websocket/socketserver"
 	"crud-toy/logger"
-	"fmt"
 	"net/http"
+
 	"github.com/urfave/negroni"
 )
 
 func Start() error {
 
+	ctx := context.Background()
 	appPort := ":" + config.Config().AppPort
 	server := negroni.New(negroni.NewRecovery())
 
 	etcdClient := etcd.NewClient()
 	defer etcdClient.Close()
+
+	watchChan := etcdClient.SetWatchOnPrefix(ctx, "key")
+	go socketserver.Start(watchChan)
 
 	exec := execution.NewExec(etcdClient)
 	procHandler := handler.NewProcHandler(exec)
@@ -35,18 +40,6 @@ func Start() error {
 		Addr:    appPort,
 		Handler: server,
 	}
-
-	go func() {
-		ctx := context.Background()
-		client := etcd.NewClient()
-		defer client.Close()
-		watchChan := client.SetWatchOnPrefix(ctx, "key")
-		for watchResp := range watchChan {
-			for _, event := range watchResp.Events {
-				fmt.Printf("Event received! %s executed on %q with value %q\n", event.Type, event.Kv.Key, event.Kv.Value)
-			}
-		}
-	}()
 
 	if err = httpServer.ListenAndServe(); err != nil {
 		logger.Error("HTTP Server Failed ", err)
