@@ -3,7 +3,7 @@ CRUD operations using ETCD
 
 ## Problem Statement
 
-The task was to create a full fledged application that is able to do CRUD with etcd and also integrate logger and config properly.
+The task was to create a full fledged application that is able to do CRUD with etcd and to integrate logger and config. Addons are implementation of a websocket and a router that can be used to handle grpc requests as well as http requests.
 
 ## Development
 
@@ -12,7 +12,11 @@ The task was to create a full fledged application that is able to do CRUD with e
 3. `make build`
 
 
-## Build 
+## Running 
+
+Build the proto file -:
+
+`protoc --go_out=. --go_opt=paths=source_relative  ./procProto/process.proto`
 
 To run the server -: 
 

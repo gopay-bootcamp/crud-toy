@@ -6,6 +6,7 @@ require (
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/fatih/color v1.7.0
 	github.com/go-openapi/strfmt v0.19.5 // indirect
+	github.com/golang/protobuf v1.4.1
 	github.com/gorilla/mux v1.7.4
 	github.com/hashicorp/hcl v1.0.0
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
@@ -19,5 +20,6 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.3.0
 	github.com/urfave/negroni v1.0.0
+	google.golang.org/protobuf v1.25.0
 	gotest.tools v2.2.0+incompatible
 )
