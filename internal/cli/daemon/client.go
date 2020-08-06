@@ -1,14 +1,27 @@
 package daemon
 
 import (
+	"crud-toy/procProto"
+	"crud-toy/config"
 	"crud-toy/internal/cli/client"
 	"errors"
+	"google.golang.org/grpc"
 )
 
 var proctorDClient client.Client
+var proctorDClientGrpc client.GrpcClient
+var (
+	grpcEnabled = config.Config().GrpcEnabled
+)
 
 func StartClient() {
-	proctorDClient = client.NewClient()
+	if grpcEnabled == false{
+		proctorDClient = client.NewClient()
+	} else{
+		conn, _ := grpc.Dial("localhost:8000",grpc.WithInsecure())
+		grpcclient := procProto.NewProcServiceClient(conn)
+		proctorDClientGrpc = client.NewGrpcClient(grpcclient)
+	}
 }
 
 func FindProcs(args []string) error {
@@ -16,7 +29,11 @@ func FindProcs(args []string) error {
 		return errors.New("Invalid argument error")
 	}
 	id := args[0]
-	return proctorDClient.FindProcs(id)
+	if grpcEnabled == false{
+		return proctorDClient.FindProcs(id)
+	} else {
+		return proctorDClientGrpc.FindProcsGrpc(id)
+	}
 }
 
 func CreateProcs(args []string) error {
@@ -25,7 +42,11 @@ func CreateProcs(args []string) error {
 	}
 	name := args[0]
 	author := args[1]
-	return proctorDClient.CreateProcs(name, author)
+	if grpcEnabled == false{
+		return proctorDClient.CreateProcs(name, author)
+	} else {
+		return proctorDClientGrpc.CreateProcsGrpc(name,author)
+	}
 }
 
 func UpdateProcs(args []string) error {
@@ -35,7 +56,12 @@ func UpdateProcs(args []string) error {
 	id := args[0]
 	name := args[1]
 	author := args[2]
-	return proctorDClient.UpdateProcs(id, name, author)
+
+	if grpcEnabled == false{
+		return proctorDClient.UpdateProcs(id, name, author)
+	} else {
+		return proctorDClientGrpc.UpdateProcsGrpc(id,name,author)
+	}
 }
 
 func DeleteProcs(args []string) error {
@@ -43,7 +69,11 @@ func DeleteProcs(args []string) error {
 		return errors.New("Invalid argument error")
 	}
 	id := args[0]
-	return proctorDClient.DeleteProcs(id)
+	if grpcEnabled == false{
+		return proctorDClient.DeleteProcs(id)
+	} else {
+		return proctorDClientGrpc.DeleteProcsGrpc(id)
+	}
 }
 
 func ReadAllProcs() error {

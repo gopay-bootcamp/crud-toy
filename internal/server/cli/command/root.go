@@ -3,6 +3,7 @@ package command
 import (
 	"crud-toy/logger"
 	"crud-toy/internal/server/cli/command/start"
+	"crud-toy/internal/server/cli/command/grpcStart"
 	"fmt"
 	"os"
 
@@ -29,4 +30,5 @@ func init() {
 	logger.Setup()
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.AddCommand(start.GetCmd())
+	rootCmd.AddCommand(grpcStart.GetCmd())
 }

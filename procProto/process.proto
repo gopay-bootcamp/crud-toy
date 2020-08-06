@@ -1,0 +1,41 @@
+syntax = "proto3";
+option go_package = "crud-toy/procProto";
+
+message Proc{
+    string ID=1;
+    string name=2;
+    string author=3;
+}
+
+message ProcID{
+    string value=1;
+    string message=2;
+}
+
+message RequestForCreateProc{
+    string name=1;
+    string author=2;
+}
+
+message RequestForReadByID{
+    string ID=1;
+}
+
+message RequestForUpdateProcByID{
+    string ID=1;
+    string name=2;
+    string author=3;
+}
+
+message RequestForDeleteByID{
+    string ID=1;
+}
+
+service ProcService{
+    rpc CreateProc(RequestForCreateProc) returns (ProcID);
+    rpc ReadProcByID(RequestForReadByID) returns (Proc);
+    rpc UpdateProcByID(RequestForUpdateProcByID) returns (ProcID);
+    rpc DeleteProcByID(RequestForDeleteByID) returns (ProcID);
+}
+
+
