@@ -53,40 +53,52 @@ func SetupConnection(clientListener net.Listener) net.Conn {
 	return connectionWithClient
 }
 func acceptMessageFromClient(connectionWithClient net.Conn, writeChan chan string, writeChans map[string](chan string)) {
-	log.Print("Setting up reader for: ", connectionWithClient.RemoteAddr())
 	for {
 		reader := bufio.NewReader(connectionWithClient)
 		dataFromClient, dataFromClientError := reader.ReadString('\n')
+		if dataFromClientError.Error() == "EOF" {
+			removeClientChannel(connectionWithClient, writeChan, writeChans)
+			return
+		}
 		if dataFromClientError != nil {
 			log.Fatal(dataFromClientError)
+			return
 		}
 		if strings.TrimSpace(string(dataFromClient)) == "STOP" {
-			fmt.Print("Deleting the channel")
-			writeChan <- "STOP"
-			race.Lock()
-			delete(writeChans, connectionWithClient.RemoteAddr().String())
-			race.Unlock()
+			removeClientChannel(connectionWithClient, writeChan, writeChans)
 			return
 		}
 		fmt.Print("From client -> ", string(dataFromClient))
 	}
 }
-func writeMessageToClient(connectionWithClient net.Conn, writeChan chan string) {
-	log.Print("Setting up writer for: ", connectionWithClient.RemoteAddr())
+func setWatchForClient(connectionWithClient net.Conn, writeChan chan string) {
 	for message := range writeChan {
-		connectionWithClient.Write([]byte(message))
 		if strings.TrimSpace(message) == "STOP" {
 			return
 		}
 	}
 }
-func SetupReaderAndWriter(connectionWithClient net.Conn, writeChans map[string](chan string)) {
+func SetupReaderAndWriter(connectionWithClient net.Conn, writeChans map[string]chan string) {
+	newChan := createClientChannel(connectionWithClient, writeChans)
+	log.Println("Number of channels: ", len(writeChans))
+	log.Println("Setting watcher for client at: ", connectionWithClient.RemoteAddr())
+	go acceptMessageFromClient(connectionWithClient, newChan, writeChans)
+	setWatchForClient(connectionWithClient, newChan)
+	log.Print("Closing connection with client at: ", connectionWithClient.RemoteAddr())
+}
+
+func removeClientChannel(connectionWithClient net.Conn, writeChan chan string, writeChans map[string]chan string) {
+	fmt.Print("Deleting the channel")
+	close(writeChan)
+	race.Lock()
+	delete(writeChans, connectionWithClient.RemoteAddr().String())
+	race.Unlock()
+}
+
+func createClientChannel(connectionWithClient net.Conn, writeChans map[string]chan string) chan string {
 	newChan := make(chan string)
 	race.Lock()
 	writeChans[connectionWithClient.RemoteAddr().String()] = newChan
 	race.Unlock()
-	go acceptMessageFromClient(connectionWithClient, newChan, writeChans)
-	go writeMessageToClient(connectionWithClient, newChan)
-	log.Println("You can now start communication")
-
+	return newChan
 }
