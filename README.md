@@ -10,13 +10,15 @@ The task was to create a full fledged application that is able to do CRUD with e
 1. golang
 2. protoc-gen-go
 ### installation
-    `go get -u google.golang.org/protobuf/cmd/protoc-gen-go`
-    `go install google.golang.org/protobuf/cmd/protoc-gen-go`
+    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+
+    go install google.golang.org/protobuf/cmd/protoc-gen-go
 
 3. protoc-gen-go-grpc
 ### installation
-    `go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc`
-    `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc`
+    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
 ## Development
 
@@ -31,11 +33,20 @@ The task was to create a full fledged application that is able to do CRUD with e
 Build the proto file -:
 
 `protoc --go_out=. --go_opt=paths=source_relative  ./procProto/process.proto`
+
 `protoc --go-grpc_out=. --go-grpc_opt=requireUnimplementedServers=false  ./procProto/process.proto` 
 
-To run the server -: 
+To enable and disable Grpc server-:
+
+* Go to the config file `config.yml`, find the field called `grpcEnabled` and set that to `true` or `false` as needed
+
+To run the http server -: 
 
 `_output/bin/server start`
+
+To run the grpc server -:
+
+`_output/bin/server grpcStart`
 
 To run the client -:
 
