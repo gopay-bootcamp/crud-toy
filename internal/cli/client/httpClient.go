@@ -30,8 +30,6 @@ func NewClient() Client {
 	}
 }
 
-
-
 type Proc struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`

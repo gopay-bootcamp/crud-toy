@@ -20,6 +20,8 @@ require (
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.3.0
 	github.com/urfave/negroni v1.0.0
+	google.golang.org/grpc v1.27.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v0.0.0-20200805213715-b2f0b7930d06 // indirect
 	google.golang.org/protobuf v1.25.0
 	gotest.tools v2.2.0+incompatible
 )

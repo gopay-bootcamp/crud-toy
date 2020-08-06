@@ -9,6 +9,5 @@ import (
 func main() {
 	io.InitPrinter()
 	daemon.StartClient()
-
 	command.Execute()
 }

@@ -12,7 +12,7 @@ var startCmd = &cobra.Command{
 	Short:   "Start the grpc server",
 	Long:    `Start the grpc server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		server.Start()
+		grpc.Start()
 	},
 }
 
