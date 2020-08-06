@@ -56,16 +56,11 @@ func acceptMessageFromClient(connectionWithClient net.Conn, writeChan chan strin
 	for {
 		reader := bufio.NewReader(connectionWithClient)
 		dataFromClient, dataFromClientError := reader.ReadString('\n')
-		if dataFromClientError.Error() == "EOF" {
-			removeClientChannel(connectionWithClient, writeChan, writeChans)
-			return
-		}
 		if dataFromClientError != nil {
-			log.Fatal(dataFromClientError)
+			log.Println(dataFromClientError.Error())
 			return
 		}
 		if strings.TrimSpace(string(dataFromClient)) == "STOP" {
-			removeClientChannel(connectionWithClient, writeChan, writeChans)
 			return
 		}
 		fmt.Print("From client -> ", string(dataFromClient))
@@ -73,6 +68,7 @@ func acceptMessageFromClient(connectionWithClient net.Conn, writeChan chan strin
 }
 func setWatchForClient(connectionWithClient net.Conn, writeChan chan string) {
 	for message := range writeChan {
+		connectionWithClient.Write([]byte(message))
 		if strings.TrimSpace(message) == "STOP" {
 			return
 		}
@@ -80,10 +76,11 @@ func setWatchForClient(connectionWithClient net.Conn, writeChan chan string) {
 }
 func SetupReaderAndWriter(connectionWithClient net.Conn, writeChans map[string]chan string) {
 	newChan := createClientChannel(connectionWithClient, writeChans)
-	log.Println("Number of channels: ", len(writeChans))
+	defer removeClientChannel(connectionWithClient, newChan, writeChans)
+	log.Println("Number of channels : ", len(writeChans))
 	log.Println("Setting watcher for client at: ", connectionWithClient.RemoteAddr())
-	go acceptMessageFromClient(connectionWithClient, newChan, writeChans)
-	setWatchForClient(connectionWithClient, newChan)
+	go setWatchForClient(connectionWithClient, newChan)
+	acceptMessageFromClient(connectionWithClient, newChan, writeChans)
 	log.Print("Closing connection with client at: ", connectionWithClient.RemoteAddr())
 }
 
