@@ -21,7 +21,6 @@ type Execution interface {
 	ReadAllProc() ([]model.Proc, error)
 	UpdateProc(proc *model.Proc) (string, error)
 	DeleteProc(proc *model.Proc) error
-	CloseDbClient()
 }
 
 type execution struct {
@@ -92,6 +91,3 @@ func (e *execution) DeleteProc(proc *model.Proc) error {
 	return nil
 }
 
-func (e *execution) CloseDbClient() {
-	defer e.client.Close()
-}
