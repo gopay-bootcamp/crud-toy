@@ -18,12 +18,12 @@ func (m *ClientMock) DeleteKey(ctx context.Context, key string) error {
 }
 
 func (m *ClientMock) PutValue(ctx context.Context, key string, value *model.Proc) (string, error) {
-	args := m.Called()
-	return args.Get(1).(string), args.Error(2)
+	args := m.Called(value)
+	return args.Get(0).(string), args.Error(1)
 }
 
 func (m *ClientMock) GetValue(ctx context.Context, key string) (*model.Proc, error) {
-	args := m.Called()
+	args := m.Called(key)
 	return args.Get(0).(*model.Proc), args.Error(1)
 }
 
