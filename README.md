@@ -8,13 +8,25 @@ The task was to create a full fledged application that is able to do CRUD with e
 ## Prerequisites
 
 1. golang
-2. protoc-gen-go
+2. Docker
+3. Setting up etcd container
+### installation
+    docker run -d --name etcd-server \
+    --publish 2379:2379 \
+    --publish 2380:2380 \
+    --env ALLOW_NONE_AUTHENTICATION=yes \
+    --env ETCD_ADVERTISE_CLIENT_URLS=http://etcd-server:2379 \
+    bitnami/etcd:latest
+4. protobuf
+### installation
+    brew install protobuf
+5. protoc-gen-go
 ### installation
     go get -u google.golang.org/protobuf/cmd/protoc-gen-go
 
     go install google.golang.org/protobuf/cmd/protoc-gen-go
 
-3. protoc-gen-go-grpc
+6. protoc-gen-go-grpc
 ### installation
     go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
@@ -25,7 +37,6 @@ The task was to create a full fledged application that is able to do CRUD with e
 1. `git clone https://github.com/gopay-bootcamp/crud-toy.git`
 2. `cd crud-toy`
 3. `go mod tidy`
-4. `make build`
 
 
 ## Running 
@@ -40,6 +51,10 @@ To enable and disable Grpc server-:
 
 * Go to the config file `config.yml`, find the field called `grpc_enabled` and set that to `true` or `false` as needed
 
+To create the binaries -:
+
+`make build`
+
 To run the http server -: 
 
 `_output/bin/server start`
@@ -50,7 +65,7 @@ To run the grpc server -:
 
 To run the client -:
 
-`_output/bin/client <command> <args>`
+`_output/bin/cli <command> <args>`
 
 
 
