@@ -61,7 +61,7 @@ type ProctorConfig struct {
 	LogLevel string
 	AppPort  string
 	EtcdPort string
-	GrpcEnabled bool
+	Grpc_enabled bool
 }
 
 func load() ProctorConfig {
@@ -85,7 +85,7 @@ func load() ProctorConfig {
 		LogLevel: fang.GetString("log_level"),
 		EtcdPort: fang.GetString("etcd_port"),
 		AppPort: fang.GetString("app_port"),
-		GrpcEnabled: fang.GetBool("grpcEnabled"),
+		Grpc_enabled: fang.GetBool("grpc_enabled"),
 	}
 	return proctorConfig
 }

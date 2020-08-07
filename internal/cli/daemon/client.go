@@ -11,7 +11,7 @@ import (
 
 var proctorDClient client.Client
 var (
-	grpcEnabled = config.Config().GrpcEnabled
+	grpcEnabled = config.Config().Grpc_enabled
 )
 
 func StartClient() {

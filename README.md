@@ -38,7 +38,7 @@ Build the proto file -:
 
 To enable and disable Grpc server-:
 
-* Go to the config file `config.yml`, find the field called `grpcEnabled` and set that to `true` or `false` as needed
+* Go to the config file `config.yml`, find the field called `grpc_enabled` and set that to `true` or `false` as needed
 
 To run the http server -: 
 
