@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -57,11 +58,20 @@ var once sync.Once
 var config ProctorConfig
 
 type ProctorConfig struct {
-	viper    *viper.Viper
-	LogLevel string
-	AppPort  string
-	EtcdPort string
-	Grpc_enabled bool
+	viper    						*viper.Viper
+	LogLevel 						string
+	AppPort  						string
+	EtcdPort 						string
+	Grpc_enabled 					bool
+	KubeConfig 						string
+	KubeContext						string
+	DefaultNamespace 				string
+	KubeWaitForResourcePollCount 	int
+	KubeLogProcessWaitTime 			time.Duration
+	KubeJobActiveDeadlineSeconds	*int64
+	KubeJobRetries					*int32
+	KubeServiceAccountName			string
+	JobPodAnnotations				map[string]string
 }
 
 func load() ProctorConfig {
@@ -86,6 +96,15 @@ func load() ProctorConfig {
 		EtcdPort: fang.GetString("etcd_port"),
 		AppPort: fang.GetString("app_port"),
 		Grpc_enabled: fang.GetBool("grpc_enabled"),
+		KubeConfig: fang.GetString("kube.config"),
+		KubeContext: fang.GetString("kube.context"),
+		DefaultNamespace: fang.GetString("default.namespace"),
+		KubeWaitForResourcePollCount: fang.GetInt("kube.wait.for.resource.poll.count"),
+		KubeJobActiveDeadlineSeconds: GetInt64Ref(fang, "kube.job.active.deadline.seconds"),
+		KubeJobRetries: GetInt32Ref(fang, "kube.job.retries"),
+		KubeLogProcessWaitTime: time.Duration(fang.GetInt("kube.log.process.wait.time")),
+		KubeServiceAccountName: fang.GetString("kube.service.account.name"),
+		JobPodAnnotations: GetMapFromJson(fang, "job.pod.annotations"),
 	}
 	return proctorConfig
 }
