@@ -21,6 +21,7 @@ type ProcServiceClient interface {
 	ReadProcByID(ctx context.Context, in *RequestForReadByID, opts ...grpc.CallOption) (*Proc, error)
 	UpdateProcByID(ctx context.Context, in *RequestForUpdateProcByID, opts ...grpc.CallOption) (*ProcID, error)
 	DeleteProcByID(ctx context.Context, in *RequestForDeleteByID, opts ...grpc.CallOption) (*ProcID, error)
+	ReadAllProcs(ctx context.Context, in *RequestForReadAllProcs, opts ...grpc.CallOption) (*ProcList, error)
 }
 
 type procServiceClient struct {
@@ -67,6 +68,15 @@ func (c *procServiceClient) DeleteProcByID(ctx context.Context, in *RequestForDe
 	return out, nil
 }
 
+func (c *procServiceClient) ReadAllProcs(ctx context.Context, in *RequestForReadAllProcs, opts ...grpc.CallOption) (*ProcList, error) {
+	out := new(ProcList)
+	err := c.cc.Invoke(ctx, "/ProcService/ReadAllProcs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProcServiceServer is the server API for ProcService service.
 // All implementations should embed UnimplementedProcServiceServer
 // for forward compatibility
@@ -75,6 +85,7 @@ type ProcServiceServer interface {
 	ReadProcByID(context.Context, *RequestForReadByID) (*Proc, error)
 	UpdateProcByID(context.Context, *RequestForUpdateProcByID) (*ProcID, error)
 	DeleteProcByID(context.Context, *RequestForDeleteByID) (*ProcID, error)
+	ReadAllProcs(context.Context, *RequestForReadAllProcs) (*ProcList, error)
 }
 
 // UnimplementedProcServiceServer should be embedded to have forward compatible implementations.
@@ -92,6 +103,9 @@ func (*UnimplementedProcServiceServer) UpdateProcByID(context.Context, *RequestF
 }
 func (*UnimplementedProcServiceServer) DeleteProcByID(context.Context, *RequestForDeleteByID) (*ProcID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProcByID not implemented")
+}
+func (*UnimplementedProcServiceServer) ReadAllProcs(context.Context, *RequestForReadAllProcs) (*ProcList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadAllProcs not implemented")
 }
 
 func RegisterProcServiceServer(s *grpc.Server, srv ProcServiceServer) {
@@ -170,6 +184,24 @@ func _ProcService_DeleteProcByID_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProcService_ReadAllProcs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RequestForReadAllProcs)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProcServiceServer).ReadAllProcs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ProcService/ReadAllProcs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProcServiceServer).ReadAllProcs(ctx, req.(*RequestForReadAllProcs))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ProcService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ProcService",
 	HandlerType: (*ProcServiceServer)(nil),
@@ -189,6 +221,10 @@ var _ProcService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteProcByID",
 			Handler:    _ProcService_DeleteProcByID_Handler,
+		},
+		{
+			MethodName: "ReadAllProcs",
+			Handler:    _ProcService_ReadAllProcs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

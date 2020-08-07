@@ -12,6 +12,9 @@ message ProcID{
     string message=2;
 }
 
+message ProcList {
+    repeated Proc procs = 1;
+}
 message RequestForCreateProc{
     string name=1;
     string author=2;
@@ -31,11 +34,12 @@ message RequestForDeleteByID{
     string ID=1;
 }
 
+message RequestForReadAllProcs{}
+
 service ProcService{
     rpc CreateProc(RequestForCreateProc) returns (ProcID);
     rpc ReadProcByID(RequestForReadByID) returns (Proc);
     rpc UpdateProcByID(RequestForUpdateProcByID) returns (ProcID);
     rpc DeleteProcByID(RequestForDeleteByID) returns (ProcID);
+    rpc ReadAllProcs(RequestForReadAllProcs) returns (ProcList);
 }
-
-

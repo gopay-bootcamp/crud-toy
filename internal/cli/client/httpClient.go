@@ -2,7 +2,8 @@ package client
 
 import (
 	"bytes"
-	"crud-toy/internal/cli/printer"
+	io "crud-toy/internal/cli/printer"
+	"crud-toy/internal/model"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -163,7 +164,9 @@ func (c *client) ReadAllProcs() error {
 		if err != nil {
 			return err
 		}
-		c.printer.PrintTable(bodyBytes)
+		var procsList []model.Proc
+		json.Unmarshal(bodyBytes, &procsList)
+		c.printer.PrintTable(procsList)
 	}
 	return nil
 }
