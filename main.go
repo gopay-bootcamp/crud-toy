@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	// "bytes"
 	"fmt"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"crud-toy/config"
@@ -24,29 +24,30 @@ func main() {
 	}
 
 	listOptions := v1.ListOptions{
-		LabelSelector: "component=etcd",
+		LabelSelector: "app=hello-minikube",
 	}
 
-	podList, err := newClient.ListPod("kube-system", listOptions)
+	podList, err := newClient.ListPod("default", listOptions)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(podList[0])
 
-	readCloser, err := newClient.GetPodLogs(&podList[0])
-	if err != nil {
-		panic(err)
-	}
+	// readCloser, err := newClient.GetPodLogs(&podList[0])
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(readCloser)
+	// buf := new(bytes.Buffer)
+	// buf.ReadFrom(readCloser)
 
-	defer readCloser.Close()
+	// defer readCloser.Close()
 
-	newStr := buf.String()
+	// newStr := buf.String()
 
-	go func() {
-		fmt.Println(newStr)
-	}()
+	// go func() {
+	// 	fmt.Println(newStr)
+	// }()
 
     // Program Terminated
 }
